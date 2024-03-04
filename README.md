@@ -2,6 +2,9 @@
 
 A new Flutter project.
 
+preview:
+<img src="docs/images/Screenshot_2024-03-04-03-12-49-326_com.example.mobile_project.jpg"/>
+<img src="docs/images/Screenshot_2024-03-04-03-13-09-835_com.example.mobile_project.jpg"/>
 ## Getting Started
 
 This project is a starting point for a Flutter application.
