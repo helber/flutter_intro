@@ -22,6 +22,12 @@ samples, guidance on mobile development, and a full API reference.
 
 Para rodar o projeto devemos ter flutter instalado e um registro no [The Movie DB ](https://www.themoviedb.org/)
 
+Gerar um arquivo .env na pasta assets que contenha as variáveis:
+
+```env
+READ_ACCESS_TOKEN=
+API_KEY=
+```
 
 =======
 
