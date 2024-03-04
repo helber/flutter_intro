@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb_api/tmdb_api.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'now_playing.dart';
-// import 'default_text.dart';
-// import 'package:tmdb_api/tmdb_api.dart';
-// import 'tmdb_api.dart';
+// import 'package:google_fonts/google_fonts.dart';
+import 'playlist.dart';
 
-// https://pub.dev/packages/flutter_dotenv
-// Future main() async {
-//   runApp(MyApp());
-// }
+const List<String> genre = <String>[
+  'Em cartaz',
+  'Populares',
+  'Melhores avaliados',
+  'Em breve'
+];
+String selectedGenge = genre.first;
 
 void main() {
   runApp(MyApp());
@@ -43,23 +43,21 @@ class _HomeState extends State<Home> {
   // Em breve (/movie/upcoming)
   List upcoming = [];
 
-  // List now_playing_movies = [];
-
-  _handleSearch(String input) {
-    print(input);
-  }
-
   loadNowPlayingMovies() async {
-    await dotenv.load(fileName: "assets/.env");
+    try {
+      await dotenv.load(fileName: "assets/.env");
+    } catch (e) {}
     final String read_access_token = dotenv.get('READ_ACCESS_TOKEN');
     final String api_key = dotenv.get('API_KEY');
 
     TMDB tmdbWithCustomLogs = TMDB(ApiKeys(api_key, read_access_token),
         logConfig: ConfigLogger(showLogs: true, showErrorLogs: true));
-    Map now_playing_res = await tmdbWithCustomLogs.v3.movies.getNowPlaying();
+    Map now_playing_res =
+        await tmdbWithCustomLogs.v3.movies.getNowPlaying(language: "pt");
     Map popular_res = await tmdbWithCustomLogs.v3.movies.getPopular();
     Map top_rated_res = await tmdbWithCustomLogs.v3.movies.getTopRated();
     Map upcoming_res = await tmdbWithCustomLogs.v3.movies.getUpcoming();
+    // Map query = await tmdbWithCustomLogs.v3.genres.getMovieList();
     setState(() {
       now_playing = now_playing_res['results'];
       popular = popular_res['results'];
@@ -68,6 +66,9 @@ class _HomeState extends State<Home> {
     });
   }
 
+  // void filterMovies(String query) {}
+
+  final controller = TextEditingController();
   @override
   void initState() {
     loadNowPlayingMovies();
@@ -76,46 +77,68 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    var nowPlaing = NowPlaing(
-      nowPlaing: now_playing,
+    var nowPlaingWidget = PlayList(
+      playList: now_playing,
     );
-/*
-    var search = SizedBox(
-      height: 45,
-      width: 360,
-      child: TextField(
-        style: GoogleFonts.poppins(
-          color: const Color(0xff020202),
-          fontSize: 20,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0.5,
-        ),
-        onChanged: _handleSearch,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: const Color(0xfff1f1f1),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-          hintText: "Search",
-          hintStyle: GoogleFonts.poppins(
-              color: const Color(0xffb2b2b2),
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.5,
-              decorationThickness: 6),
-          prefixIcon: const Icon(Icons.search),
-          prefixIconColor: Colors.black,
-        ),
+    var popularWidget = PlayList(
+      playList: popular,
+    );
+    var topRatedWidget = PlayList(
+      playList: top_rated,
+    );
+    var upcomingWidget = PlayList(
+      playList: upcoming,
+    );
+    // DropdownButton
+    var genreWidget = DropdownButton<String>(
+      value: selectedGenge,
+      icon: const Icon(Icons.arrow_downward),
+      elevation: 16,
+      style: const TextStyle(color: Colors.white),
+      underline: Container(
+        height: 2,
+        color: Colors.white,
       ),
+      onChanged: (String? value) {
+        setState(() {
+          selectedGenge = value!;
+        });
+      },
+      items: genre.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
-    */
+    // Search Field
+    // var searchWidget = TextField(
+    //   onChanged: filterMovies,
+    //   controller: controller,
+    //   decoration: InputDecoration(
+    //       hintText: "Hello what do you want to watch?",
+    //       border: OutlineInputBorder(
+    //           borderRadius: BorderRadius.circular(10),
+    //           borderSide: const BorderSide(color: const Color(0x0000FA)))),
+    // );
+    // Current Widget
+    Widget getCurrentWidget(String genre) {
+      print(genre);
+      switch (genre) {
+        case 'Populares':
+          return popularWidget;
+        case 'Melhores avaliados':
+          return topRatedWidget;
+        case 'Em breve':
+          return upcomingWidget;
+      }
+      // 'Em cartaz'
+      return nowPlaingWidget;
+    }
+
+    // Return new widget
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Hello what do you want to watch?'),
-      ),
-      body: nowPlaing,
-    );
+        appBar: AppBar(title: genreWidget),
+        body: getCurrentWidget(selectedGenge));
   }
 }
