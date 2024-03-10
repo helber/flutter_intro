@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class MovieIcon extends StatelessWidget {
   final Map movie;
 
-  const MovieIcon({Key? key, required this.movie}) : super(key: key);
+  const MovieIcon({super.key, required this.movie});
   @override
   Widget build(BuildContext context) {
     return Column(

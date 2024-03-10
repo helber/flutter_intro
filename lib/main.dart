@@ -13,14 +13,16 @@ const List<String> genre = <String>[
 String selectedGenge = genre.first;
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Home(),
+      home: const Home(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           brightness: Brightness.dark, primaryColor: Colors.lightBlueAccent),
@@ -29,6 +31,8 @@ class MyApp extends StatelessWidget {
 }
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
   _HomeState createState() => _HomeState();
 }
@@ -47,22 +51,22 @@ class _HomeState extends State<Home> {
     try {
       await dotenv.load(fileName: "assets/.env");
     } catch (e) {}
-    final String read_access_token = dotenv.get('READ_ACCESS_TOKEN');
-    final String api_key = dotenv.get('API_KEY');
+    final String readAccessToken = dotenv.get('READ_ACCESS_TOKEN');
+    final String apiKey = dotenv.get('API_KEY');
 
-    TMDB tmdbWithCustomLogs = TMDB(ApiKeys(api_key, read_access_token),
-        logConfig: ConfigLogger(showLogs: true, showErrorLogs: true));
-    Map now_playing_res =
+    TMDB tmdbWithCustomLogs = TMDB(ApiKeys(apiKey, readAccessToken),
+        logConfig: const ConfigLogger(showLogs: true, showErrorLogs: true));
+    Map nowPlayingRes =
         await tmdbWithCustomLogs.v3.movies.getNowPlaying(language: "pt");
-    Map popular_res = await tmdbWithCustomLogs.v3.movies.getPopular();
-    Map top_rated_res = await tmdbWithCustomLogs.v3.movies.getTopRated();
-    Map upcoming_res = await tmdbWithCustomLogs.v3.movies.getUpcoming();
+    Map popularRes = await tmdbWithCustomLogs.v3.movies.getPopular();
+    Map topRatedRes = await tmdbWithCustomLogs.v3.movies.getTopRated();
+    Map upcomingRes = await tmdbWithCustomLogs.v3.movies.getUpcoming();
     // Map query = await tmdbWithCustomLogs.v3.genres.getMovieList();
     setState(() {
-      now_playing = now_playing_res['results'];
-      popular = popular_res['results'];
-      top_rated = top_rated_res['results'];
-      upcoming = upcoming_res['results'];
+      now_playing = nowPlayingRes['results'];
+      popular = popularRes['results'];
+      top_rated = topRatedRes['results'];
+      upcoming = upcomingRes['results'];
     });
   }
 
